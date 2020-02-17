@@ -23,7 +23,7 @@ const updateEntry = <M extends Model>(
   });
 
   // TODO: MySql doesn't support `returning` but postgres does so it must be
-  // optional to do seperate `findOne` record
+  // optional to do seperate `findOne` operation
   const updatedRecord = await model.findOne({
     where: { [primaryKey]: id }
   });
