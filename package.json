@@ -1,0 +1,24 @@
+{
+  "name": "express-ticket-with-sequelize",
+  "version": "0.0.1",
+  "description": "Use middlewares to reduce repetitive tasks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ertankara/express-ticket-with-sequelize.git"
+  },
+  "keywords": [
+    "express",
+    "middlewares",
+    "sequelize"
+  ],
+  "author": "Ertan Kara",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ertankara/express-ticket-with-sequelize/issues"
+  },
+  "homepage": "https://github.com/ertankara/express-ticket-with-sequelize#readme"
+}
