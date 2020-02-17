@@ -44,7 +44,7 @@ const deleteRecord = <M extends Model>(
       res.deletedRecordResults = {
         affectedRowCount,
         deletedRecord,
-        deletedRecordId: deletedRecord[primaryKey]
+        deletedRecordId: 0 //  deletedRecord ? deletedRecord[primaryKey] : -1
       };
       break;
     case DeleteMode.hard:
