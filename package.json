@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "build": "tsc",
+    "build": "tsc && rm lib/__tests__/test.d.ts",
     "lint": "eslint src/**/*",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
