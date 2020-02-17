@@ -2,9 +2,17 @@
   "name": "express-ticket-with-sequelize",
   "version": "0.0.1",
   "description": "Use middlewares to reduce repetitive tasks",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --config jestconfig.json",
+    "build": "tsc",
+    "lint": "eslint src/**/*",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run lint && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -20,5 +28,28 @@
   "bugs": {
     "url": "https://github.com/ertankara/express-ticket-with-sequelize/issues"
   },
-  "homepage": "https://github.com/ertankara/express-ticket-with-sequelize#readme"
+  "homepage": "https://github.com/ertankara/express-ticket-with-sequelize#readme",
+  "devDependencies": {
+    "@types/jest": "^25.1.2",
+    "@typescript-eslint/eslint-plugin": "^2.19.2",
+    "@typescript-eslint/parser": "^2.19.2",
+    "babel-eslint": "^9.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.1",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-config-wesbos": "0.0.19",
+    "eslint-plugin-html": "^5.0.5",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.18.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.2.0",
+    "typescript": "^3.7.5"
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }
