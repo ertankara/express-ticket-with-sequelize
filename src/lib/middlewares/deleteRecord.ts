@@ -23,6 +23,7 @@ const deleteRecord = <M extends Model>(
   // If both keys are not present, then assume only primary key is provided
   const { fkIfPassedPkElsePk, pk } = identifier;
   const { [fkIfPassedPkElsePk]: id } = req.params;
+  const primaryKey = pk || fkIfPassedPkElsePk;
 
   switch (deleteMode) {
     case DeleteMode.soft:
@@ -30,13 +31,24 @@ const deleteRecord = <M extends Model>(
         throw new Error(
           "deleteRecord() requires `statusKey` and `statusValue` to be set when applying `soft` delete"
         );
-      await model.update(
+
+      const deletedRecord = await model.findOne({
+        where: { [primaryKey]: id }
+      });
+
+      const [, affectedRowCount] = await model.update(
         { [statusKey]: statusValue },
-        { where: { [pk || fkIfPassedPkElsePk]: id } }
+        { where: { [primaryKey]: id } }
       );
+
+      res.deletedRecordResults = {
+        affectedRowCount,
+        deletedRecord,
+        deletedRecordId: deletedRecord[primaryKey]
+      };
       break;
     case DeleteMode.hard:
-      await model.destroy({ where: { [pk || fkIfPassedPkElsePk]: id } });
+      await model.destroy({ where: { [primaryKey]: id } });
       break;
     default:
       throw new Error("deleteEntry() received unknown deleteMode");

@@ -16,10 +16,23 @@ const updateEntry = <M extends Model>(
   // If both keys are not present, then assume only primary key is provided
   const { fkIfPassedPkElsePk, pk } = identifier;
   const { [fkIfPassedPkElsePk]: id } = req.params;
+  const primaryKey = pk || fkIfPassedPkElsePk;
 
-  await model.update(req.body, { where: { [pk || fkIfPassedPkElsePk]: id } });
+  const [, affectedRowCount] = await model.update(req.body, {
+    where: { [primaryKey]: id }
+  });
 
-  res.updateEntryResult = {};
+  // TODO: MySql doesn't support `returning` but postgres does so it must be
+  // optional to do seperate `findOne` record
+  const updatedRecord = await model.findOne({
+    where: { [primaryKey]: id }
+  });
+
+  res.updatedRecordResults = {
+    updatedRecord,
+    affectedRowCount,
+    updatedRecordId: primaryKey
+  };
 
   next();
 };
