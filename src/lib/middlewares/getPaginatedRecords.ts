@@ -22,8 +22,13 @@ const getPaginatedResults = <
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
-  paginationParams: PaginationParams | null = null,
-  filters: FilterParams[] | undefined = []
+  {
+    filters = [],
+    paginationParams = null
+  }: {
+    paginationParams?: PaginationParams | null;
+    filters: FilterParams[];
+  }
 ) => async (req: Request, res: Response, next: NextFunction) => {
   let pageNumber;
   let pageSizeNumber;

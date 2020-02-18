@@ -15,33 +15,41 @@ const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
-  identifier: IdentifierKeys,
-  returning = false
-) => async (req: Request, res: Response, next: NextFunction) => {
-  // If both keys are not present, then assume only primary key is provided
-  const { fkIfPassedPkElsePk, pk } = identifier;
-  const { [fkIfPassedPkElsePk]: id } = req.params;
-  const primaryKey = pk || fkIfPassedPkElsePk;
+  {
+    identifier,
+    returning = false
+  }: {
+    identifier: IdentifierKeys;
+    returning?: boolean;
+  }
+) =>
+  // identifier: IdentifierKeys,
+  // returning = false
+  async (req: Request, res: Response, next: NextFunction) => {
+    // If both keys are not present, then assume only primary key is provided
+    const { fkIfPassedPkElsePk, pk } = identifier;
+    const { [fkIfPassedPkElsePk]: id } = req.params;
+    const primaryKey = pk || fkIfPassedPkElsePk;
 
-  const [, affectedRowCount] = await model.update(req.body, {
-    where: { [primaryKey]: id }
-  });
-
-  // TODO: MySql doesn't support `returning` but postgres does so it must be
-  // optional to do seperate `findOne` operation
-  let updatedRecord = null;
-  if (returning) {
-    updatedRecord = await model.findOne({
+    const [, affectedRowCount] = await model.update(req.body, {
       where: { [primaryKey]: id }
     });
-  }
-  res.locals[LOCAL_UPDATED_RECORD_RESULT] = {
-    updatedRecord,
-    affectedRowCount,
-    updatedRecordId: primaryKey
-  };
 
-  next();
-};
+    // TODO: MySql doesn't support `returning` but postgres does so it must be
+    // optional to do seperate `findOne` operation
+    let updatedRecord = null;
+    if (returning) {
+      updatedRecord = await model.findOne({
+        where: { [primaryKey]: id }
+      });
+    }
+    res.locals[LOCAL_UPDATED_RECORD_RESULT] = {
+      updatedRecord,
+      affectedRowCount,
+      updatedRecordId: primaryKey
+    };
+
+    next();
+  };
 
 export default updateEntry;

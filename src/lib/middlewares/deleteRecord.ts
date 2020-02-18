@@ -5,6 +5,8 @@ import { DeleteMode } from "../utils/enums";
 import { DeleteOnConditions, IdentifierKeys } from "../utils/types";
 import { LOCAL_DELETED_RECORD_RESULT } from "../utils/constants";
 
+const FUNCTION_NAME = "deleteRecord()";
+
 /**
  *
  * @param model Represents sequelize model to pass
@@ -39,7 +41,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
     case DeleteMode.soft:
       if (statusKey == null || statusValue == null)
         throw new Error(
-          "deleteRecord() requires `statusKey` and `statusValue` to be set when applying `soft` delete"
+          `${FUNCTION_NAME} requires 'statusKey' and 'statusValue' to be set when applying 'soft' delete`
         );
 
       const deletedRecord = await model.findOne({
@@ -66,7 +68,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
       };
       break;
     default:
-      throw new Error("deleteEntry() received unknown deleteMode");
+      throw new Error(`${FUNCTION_NAME} received unknown deleteMode`);
   }
 
   next();
