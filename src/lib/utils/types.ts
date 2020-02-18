@@ -11,6 +11,6 @@ export type DeleteOnConditions = {
 export type IdentifierKeys = { fkIfPassedPkElsePk: string; pk?: string };
 
 export type PaginationParams = {
-  pageSizeVariableName: number;
-  pageNumberVariableName: number;
+  pageSizeVariableName: string;
+  pageNumberVariableName: string;
 };
