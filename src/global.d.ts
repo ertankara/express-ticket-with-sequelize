@@ -11,7 +11,7 @@ declare namespace Express {
       affectedRowCount: any; // number | undefined;
       deletedRecordId: any; // string | number | undefined;
     };
-    addedRecordResults: {
+    createdRecordResults: {
       newRecord: Record<string, any>;
     };
   }

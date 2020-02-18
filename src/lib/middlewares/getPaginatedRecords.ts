@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { FilterParams, PaginationParams } from "../utils/types";
+import { LOCAL_PAGINATED_RECORD_RESULT } from "../utils/constants";
 
 /**
  *
@@ -72,7 +73,7 @@ const getPaginatedResults = <
     where: searchParams
   });
 
-  res.paginatedResults = results;
+  res.locals[LOCAL_PAGINATED_RECORD_RESULT] = results;
 
   next();
 };

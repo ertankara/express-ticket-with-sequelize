@@ -3,6 +3,7 @@ import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { DeleteMode } from "../utils/enums";
 import { DeleteOnConditions, IdentifierKeys } from "../utils/types";
+import { LOCAL_DELETED_RECORD_RESULT } from "../utils/constants";
 
 /**
  *
@@ -18,9 +19,15 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
-  identifier: IdentifierKeys,
-  conditionParams: DeleteOnConditions = {},
-  deleteMode: DeleteMode = DeleteMode.soft
+  {
+    identifier,
+    conditionParams,
+    deleteMode = DeleteMode.soft
+  }: {
+    identifier: IdentifierKeys;
+    conditionParams: DeleteOnConditions;
+    deleteMode?: DeleteMode;
+  }
 ) => async (req: Request, res: Response, next: NextFunction) => {
   const { statusKey, statusValue } = conditionParams;
   // If both keys are not present, then assume only primary key is provided
@@ -44,14 +51,19 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
         { where: { [primaryKey]: id } }
       );
 
-      res.deletedRecordResults = {
+      res.locals[LOCAL_DELETED_RECORD_RESULT] = {
         affectedRowCount,
         deletedRecord,
-        deletedRecordId: 0 //  deletedRecord ? deletedRecord[primaryKey] : -1
+        deletedRecordId: id
       };
       break;
     case DeleteMode.hard:
-      await model.destroy({ where: { [primaryKey]: id } });
+      const deletedRecordId = await model.destroy({
+        where: { [primaryKey]: id }
+      });
+      res.locals[LOCAL_DELETED_RECORD_RESULT] = {
+        deletedRecordId
+      };
       break;
     default:
       throw new Error("deleteEntry() received unknown deleteMode");

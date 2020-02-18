@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { IdentifierKeys } from "../utils/types";
+import { LOCAL_UPDATED_RECORD_RESULT } from "../utils/constants";
 
 /**
  * Relies on `req.body` to update the record
@@ -14,7 +15,8 @@ const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
-  identifier: IdentifierKeys
+  identifier: IdentifierKeys,
+  returning = false
 ) => async (req: Request, res: Response, next: NextFunction) => {
   // If both keys are not present, then assume only primary key is provided
   const { fkIfPassedPkElsePk, pk } = identifier;
@@ -27,11 +29,13 @@ const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
 
   // TODO: MySql doesn't support `returning` but postgres does so it must be
   // optional to do seperate `findOne` operation
-  const updatedRecord = await model.findOne({
-    where: { [primaryKey]: id }
-  });
-
-  res.updatedRecordResults = {
+  let updatedRecord = null;
+  if (returning) {
+    updatedRecord = await model.findOne({
+      where: { [primaryKey]: id }
+    });
+  }
+  res.locals[LOCAL_UPDATED_RECORD_RESULT] = {
     updatedRecord,
     affectedRowCount,
     updatedRecordId: primaryKey
