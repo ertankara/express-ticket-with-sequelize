@@ -1,8 +1,8 @@
 {
   "name": "express-ticket-with-sequelize",
-  "version": "0.0.32",
+  "version": "0.0.34",
   "description": "Use middlewares to reduce repetitive tasks",
-  "main": "lib/lib/index.js",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
@@ -53,7 +53,7 @@
     "typescript": "^3.7.5"
   },
   "files": [
-    "lib/**/*"
+    "src/**/*"
   ],
   "dependencies": {
     "express": "^4.17.1",

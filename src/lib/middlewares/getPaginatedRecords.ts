@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize-typescript";
+import { Model as TSSequelizeModel } from "sequelize-typescript";
+import { Model as SequelizeModel } from "sequelize";
 import { FilterParams, PaginationParams } from "../utils/types";
 
 /**
@@ -13,8 +14,13 @@ import { FilterParams, PaginationParams } from "../utils/types";
  *                         from the `req.query`
  * @param filters Filter data with conditions
  */
-const getPaginatedResults = <M extends Model>(
-  model: { new (): M } & typeof Model,
+const getPaginatedResults = <
+  M extends TSSequelizeModel,
+  K extends SequelizeModel
+>(
+  model:
+    | ({ new (): M } & typeof TSSequelizeModel)
+    | ({ new (): K } & typeof SequelizeModel),
   paginationParams: PaginationParams | null = null,
   filters: FilterParams[] | undefined = []
 ) => async (req: Request, res: Response, next: NextFunction) => {

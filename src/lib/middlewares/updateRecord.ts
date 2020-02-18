@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize-typescript";
+import { Model as TSSequelizeModel } from "sequelize-typescript";
+import { Model as SequelizeModel } from "sequelize";
 import { IdentifierKeys } from "../utils/types";
 
 /**
@@ -9,8 +10,10 @@ import { IdentifierKeys } from "../utils/types";
  *                   retrieved from the `req.params` which forces you to be semantic
  *                   with REST
  */
-const updateEntry = <M extends Model>(
-  model: { new (): M } & typeof Model,
+const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
+  model:
+    | ({ new (): M } & typeof TSSequelizeModel)
+    | ({ new (): K } & typeof SequelizeModel),
   identifier: IdentifierKeys
 ) => async (req: Request, res: Response, next: NextFunction) => {
   // If both keys are not present, then assume only primary key is provided
