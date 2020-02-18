@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize";
+import { Model } from "sequelize-typescript";
 
 /**
  * Creates a row in database for the given `Model` e.g if User is passed as model

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize";
+import { Model } from "sequelize-typescript";
 import { DeleteMode } from "../utils/enums";
 import { DeleteOnConditions, IdentifierKeys } from "../utils/types";
 

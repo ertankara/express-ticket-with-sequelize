@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize";
+import { Model } from "sequelize-typescript";
 import { FilterParams, PaginationParams } from "../utils/types";
 
 /**
