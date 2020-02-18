@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize-typescript";
+import { Model as TSSequelizeModel } from "sequelize-typescript";
+import { Model as SequelizeModel } from "sequelize";
 import { DeleteMode } from "../utils/enums";
 import { DeleteOnConditions, IdentifierKeys } from "../utils/types";
 
@@ -13,8 +14,10 @@ import { DeleteOnConditions, IdentifierKeys } from "../utils/types";
  *                   while `hard` deletes the record completely and NOT UNDOABLE
  *                   => defaults to soft
  */
-const deleteRecord = <M extends Model>(
-  model: { new (): M } & typeof Model,
+const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
+  model:
+    | ({ new (): M } & typeof TSSequelizeModel)
+    | ({ new (): K } & typeof SequelizeModel),
   identifier: IdentifierKeys,
   conditionParams: DeleteOnConditions = {},
   deleteMode: DeleteMode = DeleteMode.soft
