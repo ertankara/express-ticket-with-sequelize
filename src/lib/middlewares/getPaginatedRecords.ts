@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { FilterParams, PaginationParams } from "../utils/types";
-import { LOCAL_PAGINATED_RECORD_RESULT } from "../utils/constants";
+import {
+  LOCAL_PAGINATED_RECORD_RESULT,
+  BASE_PAGE_NUMBER
+} from "../utils/constants";
 
 /**
  *
@@ -60,7 +63,7 @@ const getPaginatedResults = <
     }
   }
 
-  const [normalizedPage, normalizedPageSize] = [pageNumber, pageSizeNumber]
+  let [normalizedPage, normalizedPageSize] = [pageNumber, pageSizeNumber]
     .map((param: string) => Number.parseInt(param))
     .filter((param: number) => !Number.isNaN(param));
 
@@ -71,6 +74,10 @@ const getPaginatedResults = <
   ) {
     return next();
   }
+
+  // It breaks SQL query if `normalizedPage` is less than 0 while querying
+  normalizedPage =
+    normalizedPage < BASE_PAGE_NUMBER ? BASE_PAGE_NUMBER : normalizedPage;
 
   const results = await model.findAll({
     offset: (normalizedPage - 1) * normalizedPageSize,
