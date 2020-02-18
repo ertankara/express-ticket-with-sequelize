@@ -22,7 +22,7 @@ const updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   }: {
     identifier: IdentifierKeys;
     returning?: boolean;
-    where: Record<string, any>;
+    where?: Record<string, any>;
   }
 ) =>
   // identifier: IdentifierKeys,

@@ -97,7 +97,7 @@ getPaginatedResults = <
     where = {}
   }: {
     paginationParams?: PaginationParams | null;
-    where: FindOptions; // plain old sequelize 'where'
+    where?: Record<string, any>; // plain old sequelize 'where'
   }
 )
 ```
@@ -138,7 +138,7 @@ updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   }: {
     identifier: IdentifierKeys;
     returning?: boolean;
-    where?: FindOptions;
+    where?: Record<string, any>;
   }
 )
 ```
@@ -218,11 +218,13 @@ deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   {
     identifier,
     conditionParams,
-    deleteMode = DeleteMode.soft
+    deleteMode = DeleteMode.soft,
+    where = {}
   }: {
     identifier: IdentifierKeys;
     conditionParams: DeleteStatusKey;
     deleteMode?: DeleteMode;
+    where?: Record<string, any>;
   }
 )
 ```
