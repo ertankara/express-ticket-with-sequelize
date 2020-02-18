@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { DeleteMode } from "../utils/enums";
-import { DeleteOnConditions, IdentifierKeys } from "../utils/types";
-import { LOCAL_DELETED_RECORD_RESULT } from "../utils/constants";
+import { DeleteStatusKey, IdentifierKeys } from "../utils/types";
+import { LOCAL_DELETED } from "../utils/constants";
 
 const FUNCTION_NAME = "deleteRecord()";
 
@@ -24,10 +24,12 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   {
     identifier,
     conditionParams,
-    deleteMode = DeleteMode.soft
+    deleteMode = DeleteMode.soft,
+    where = {}
   }: {
     identifier: IdentifierKeys;
-    conditionParams: DeleteOnConditions;
+    conditionParams: DeleteStatusKey;
+    where?: Record<string, any>;
     deleteMode?: DeleteMode;
   }
 ) => async (req: Request, res: Response, next: NextFunction) => {
@@ -50,10 +52,10 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
 
       const [, affectedRowCount] = await model.update(
         { [statusKey]: statusValue },
-        { where: { [primaryKey]: id } }
+        { where: { ...{ [primaryKey]: id }, ...where } }
       );
 
-      res.locals[LOCAL_DELETED_RECORD_RESULT] = {
+      res.locals[LOCAL_DELETED] = {
         affectedRowCount,
         deletedRecord,
         deletedRecordId: id
@@ -61,9 +63,9 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
       break;
     case DeleteMode.hard:
       const deletedRecordId = await model.destroy({
-        where: { [primaryKey]: id }
+        where: { ...{ [primaryKey]: id }, ...where }
       });
-      res.locals[LOCAL_DELETED_RECORD_RESULT] = {
+      res.locals[LOCAL_DELETED] = {
         deletedRecordId
       };
       break;

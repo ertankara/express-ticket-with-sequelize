@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { IdentifierKeys } from "../utils/types";
-import { LOCAL_UPDATED_RECORD_RESULT } from "../utils/constants";
+import { LOCAL_UPDATED } from "../utils/constants";
 
 /**
  * Relies on `req.body` to update the record
@@ -11,16 +11,18 @@ import { LOCAL_UPDATED_RECORD_RESULT } from "../utils/constants";
  *                   retrieved from the `req.params` which forces you to be semantic
  *                   with REST
  */
-const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
+const updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
   {
     identifier,
-    returning = false
+    returning = false,
+    where = {}
   }: {
     identifier: IdentifierKeys;
     returning?: boolean;
+    where: Record<string, any>;
   }
 ) =>
   // identifier: IdentifierKeys,
@@ -32,7 +34,7 @@ const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
     const primaryKey = pk || fkIfPassedPkElsePk;
 
     const [, affectedRowCount] = await model.update(req.body, {
-      where: { [primaryKey]: id }
+      where: { ...{ [primaryKey]: id }, ...where }
     });
 
     // TODO: MySql doesn't support `returning` but postgres does so it must be
@@ -43,7 +45,7 @@ const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
         where: { [primaryKey]: id }
       });
     }
-    res.locals[LOCAL_UPDATED_RECORD_RESULT] = {
+    res.locals[LOCAL_UPDATED] = {
       updatedRecord,
       affectedRowCount,
       updatedRecordId: primaryKey
@@ -52,4 +54,4 @@ const updateEntry = <M extends TSSequelizeModel, K extends SequelizeModel>(
     next();
   };
 
-export default updateEntry;
+export default updateRecord;

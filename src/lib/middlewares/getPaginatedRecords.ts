@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
-import { FilterParams, PaginationParams } from "../utils/types";
-import {
-  LOCAL_PAGINATED_RECORD_RESULT,
-  BASE_PAGE_NUMBER
-} from "../utils/constants";
+import { PaginationParams } from "../utils/types";
+import { LOCAL_PAGINATED, BASE_PAGE_NUMBER } from "../utils/constants";
 
 /**
  *
@@ -26,11 +23,11 @@ const getPaginatedResults = <
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
   {
-    filters = [],
-    paginationParams = null
+    paginationParams = null,
+    where = {}
   }: {
     paginationParams?: PaginationParams | null;
-    filters: FilterParams[];
+    where: Record<string, any>;
   }
 ) => async (req: Request, res: Response, next: NextFunction) => {
   let pageNumber;
@@ -55,14 +52,6 @@ const getPaginatedResults = <
     pageSizeNumber = pageSize;
   }
 
-  const searchParams: Record<string, any> = {};
-
-  if (filters.length > 0) {
-    for (const { field, expectedToEqual } of filters) {
-      searchParams[field] = expectedToEqual;
-    }
-  }
-
   let [normalizedPage, normalizedPageSize] = [pageNumber, pageSizeNumber]
     .map((param: string) => Number.parseInt(param))
     .filter((param: number) => !Number.isNaN(param));
@@ -82,10 +71,10 @@ const getPaginatedResults = <
   const results = await model.findAll({
     offset: (normalizedPage - 1) * normalizedPageSize,
     limit: normalizedPageSize,
-    where: searchParams
+    where: { ...where }
   });
 
-  res.locals[LOCAL_PAGINATED_RECORD_RESULT] = results;
+  res.locals[LOCAL_PAGINATED] = results;
 
   next();
 };

@@ -1,27 +1,4 @@
-import { DeleteMode } from "./enums";
-
-export type PaginateRecordFunctionParams = {
-  paginationParams: PaginationParams | null;
-  filters: FilterParams[] | undefined;
-};
-
-export type UpdateRecordFunctionParams = {
-  identifier: IdentifierKeys;
-  returning: boolean;
-};
-
-export type DeleteRecordFunctionParams = {
-  identifier: IdentifierKeys;
-  conditionParams: DeleteOnConditions;
-  deleteMode: DeleteMode;
-};
-
-export type FilterParams = {
-  field: string;
-  expectedToEqual: string | number | boolean;
-};
-
-export type DeleteOnConditions = {
+export type DeleteStatusKey = {
   statusKey?: string;
   statusValue?: any;
 };
