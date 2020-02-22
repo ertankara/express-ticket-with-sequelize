@@ -28,7 +28,7 @@ const getPaginatedResults = <
   }: {
     paginationParams?: PaginationParams | null;
     where?: Record<string, any>;
-  }
+  } = {}
 ) => async (req: Request, res: Response, next: NextFunction) => {
   let pageNumber;
   let pageSizeNumber;

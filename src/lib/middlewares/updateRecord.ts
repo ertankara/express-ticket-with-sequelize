@@ -20,8 +20,8 @@ const updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
     where = {}
   }: {
     requestParams: { paramName: string; passAs?: string }[];
-    returning: boolean;
-    where: Record<string, any>;
+    where?: Record<string, any>;
+    returning?: boolean;
   }
 ) => async (req: Request, res: Response, next: NextFunction) => {
   const whereFiltersForUpdate = { ...where };

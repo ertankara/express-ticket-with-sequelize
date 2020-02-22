@@ -21,7 +21,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
     useRequestBodyAtUpdate = false,
     softDeleteLabel = { key: "status", value: "deleted" },
     where = {},
-    requestParams
+    requestParams = []
   }: {
     deleteMode?: DeleteMode;
     useRequestBodyAtFilter?: boolean;

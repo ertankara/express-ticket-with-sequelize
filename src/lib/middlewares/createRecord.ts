@@ -14,7 +14,10 @@ const createRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
-  requestParams: { paramName: string; passAs?: string }[]
+  // TODO: Nest the following parameter inside an object
+  {
+    requestParams = []
+  }: { requestParams: { paramName: string; passAs?: string }[] }
 ) => async (req: Request, res: Response, next: NextFunction) => {
   // Additional data may be required to collect from the req.params
   // So if user provided a list of the data to collect from the req.params
