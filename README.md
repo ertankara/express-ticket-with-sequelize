@@ -1,3 +1,5 @@
+# DEPRECATED DOCS WILL BE UPDATED
+
 ## Express train to the response
 
 Skip writing code for CRUD operations while using `sequelize` or
