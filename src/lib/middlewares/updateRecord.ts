@@ -1,57 +1,62 @@
 import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
-import { IdentifierKeys } from "../utils/types";
 import { LOCAL_UPDATED } from "../utils/constants";
 
+const FUNCTION_NAME = "updateRecord()";
+
 /**
- * Relies on `req.body` to update the record
- * @param model Sequelize model that is passed
- * @param identifier foreign and primary keys to find the record, the key is
- *                   retrieved from the `req.params` which forces you to be semantic
- *                   with REST
+ *
+ * @param model sequelize model to pass
+ * @param options // TODO: Explain stuff
  */
 const updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
   {
-    identifier,
+    requestParams = [],
     returning = false,
     where = {}
   }: {
-    identifier: IdentifierKeys;
-    returning?: boolean;
-    where?: Record<string, any>;
+    requestParams: { paramName: string; passAs?: string }[];
+    returning: boolean;
+    where: Record<string, any>;
   }
-) =>
-  // identifier: IdentifierKeys,
-  // returning = false
-  async (req: Request, res: Response, next: NextFunction) => {
-    // If both keys are not present, then assume only primary key is provided
-    const { fkIfPassedPkElsePk, pk } = identifier;
-    const { [fkIfPassedPkElsePk]: id } = req.params;
-    const primaryKey = pk || fkIfPassedPkElsePk;
+) => async (req: Request, res: Response, next: NextFunction) => {
+  const whereFiltersForUpdate = { ...where };
+  const reqestParamFilters: Record<string, any> = {};
 
-    const [, affectedRowCount] = await model.update(req.body, {
-      where: { ...{ [primaryKey]: id }, ...where }
-    });
+  for (const { paramName, passAs } of requestParams) {
+    const paramValue = req.params[paramName];
 
-    // TODO: MySql doesn't support `returning` but postgres does so it must be
-    // optional to do seperate `findOne` operation
-    let updatedRecord = null;
-    if (returning) {
-      updatedRecord = await model.findOne({
-        where: { [primaryKey]: id }
-      });
+    if (paramValue == null) {
+      throw new Error(
+        `${FUNCTION_NAME} looking for '${paramName}' in the req.params but failed to find`
+      );
     }
-    res.locals[LOCAL_UPDATED] = {
-      updatedRecord,
-      affectedRowCount,
-      updatedRecordId: primaryKey
-    };
 
-    next();
+    reqestParamFilters[passAs || paramName] = paramValue;
+  }
+
+  const [, affectedRowCount] = await model.update(req.body, {
+    where: { ...whereFiltersForUpdate, ...reqestParamFilters }
+  });
+
+  let updatedRecords;
+
+  if (returning) {
+    updatedRecords = await model.findAll({
+      where: { ...whereFiltersForUpdate, ...reqestParamFilters }
+    });
+  }
+
+  res.locals[LOCAL_UPDATED] = {
+    updatedRecords,
+    affectedRowCount
   };
+
+  next();
+};
 
 export default updateRecord;

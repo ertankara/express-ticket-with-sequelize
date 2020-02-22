@@ -23,9 +23,9 @@ const createRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   const valuesFromParams: Record<string, any> = {};
   for (const requestParam of requestParams) {
     const paramValue = req.params[requestParam.paramName];
-    if (!paramValue) {
+    if (paramValue == null) {
       throw new Error(
-        `${FUNCTION_NAME} looking for '${requestParam.paramName}' in the req.params but fails to find`
+        `${FUNCTION_NAME} looking for '${requestParam.paramName}' in the req.params but failed to find`
       );
     }
 
