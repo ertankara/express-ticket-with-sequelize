@@ -1,4 +1,4 @@
-# DEPRECATED DOCS WILL BE UPDATED
+# DEPRECATED! DOCS WILL BE UPDATED SOON
 
 ## Express train to the response
 
