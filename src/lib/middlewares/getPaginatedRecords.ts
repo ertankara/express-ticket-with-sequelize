@@ -61,6 +61,11 @@ const getPaginatedResults = <
     (normalizedPageSize !== 0 && !normalizedPageSize) ||
     (normalizedPage !== 0 && !normalizedPage)
   ) {
+    const rawList = await model.findAll({
+      where: { ...where }
+    });
+
+    res.locals[LOCAL_PAGINATED] = rawList;
     return next();
   }
 
