@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
-import { DeleteMode } from "../utils/enums";
 import { LOCAL_DELETED } from "../utils/constants";
 
 const FUNCTION_NAME = "deleteRecord()";
@@ -16,14 +15,14 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
   {
-    deleteMode = DeleteMode.soft,
+    deleteMode = "soft",
     useRequestBodyAtFilter = false,
     useRequestBodyAtUpdate = false,
     softDeleteLabel = { key: "status", value: "deleted" },
     where = {},
     requestParams = []
   }: {
-    deleteMode?: DeleteMode;
+    deleteMode?: "soft" | "hard";
     useRequestBodyAtFilter?: boolean;
     useRequestBodyAtUpdate?: boolean;
     softDeleteLabel?: { key: string; value: any };
@@ -35,7 +34,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   }
 ) => async (req: Request, res: Response, next: NextFunction) => {
   switch (deleteMode) {
-    case DeleteMode.soft:
+    case "soft":
       {
         let whereFiltersForSoftDelete: Record<string, any> = { ...where };
         const reqestParamFilters: Record<string, any> = {};
@@ -83,7 +82,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
         };
       }
       break;
-    case DeleteMode.hard:
+    case "hard":
       {
         let whereFiltersForHardDelete: Record<string, any> = { ...where };
         const reqestParamFilter: Record<string, any> = {};

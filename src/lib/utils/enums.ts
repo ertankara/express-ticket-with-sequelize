@@ -1,8 +1,3 @@
-export enum DeleteMode {
-  soft,
-  hard
-}
-
 export enum ResponseLocalKeys {
   paginatedResults = "paginatedResults",
   deletedRecordResults = "deletedRecordResults",

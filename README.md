@@ -220,12 +220,12 @@ deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   {
     identifier,
     conditionParams,
-    deleteMode = DeleteMode.soft,
+    deleteMode = "soft",
     where = {}
   }: {
     identifier: IdentifierKeys;
     conditionParams: DeleteStatusKey;
-    deleteMode?: DeleteMode;
+    deleteMode?: "soft" | "hard";
     where?: Record<string, any>;
   }
 )
