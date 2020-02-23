@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
-import { LOCAL_DELETED } from "../utils/constants";
+import {
+  LOCAL_AFFECTED_RECORDS,
+  LOCAL_AFFECTED_ROW_COUNT
+} from "../utils/constants";
 
 const FUNCTION_NAME = "deleteRecord()";
 
@@ -38,7 +41,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
       {
         let whereFiltersForSoftDelete: Record<string, any> = { ...where };
         const reqestParamFilters: Record<string, any> = {};
-        let updateObject = { [softDeleteLabel.key]: softDeleteLabel.value };
+        let deleteLabels = { [softDeleteLabel.key]: softDeleteLabel.value };
 
         for (const { paramName, passAs } of requestParams) {
           const paramValue = req.params[paramName];
@@ -65,21 +68,19 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
         }
 
         if (useRequestBodyAtUpdate) {
-          updateObject = { ...updateObject, ...req.body };
+          deleteLabels = { ...deleteLabels, ...req.body };
         }
 
-        const deletedRecord = await model.findOne({
+        const deletedRecords = await model.findAll({
           where: whereFiltersForSoftDelete
         });
 
-        const [, affectedRowCount] = await model.update(updateObject, {
+        const [affectedRowCount] = await model.update(deleteLabels, {
           where: whereFiltersForSoftDelete
         });
 
-        res.locals[LOCAL_DELETED] = {
-          affectedRowCount,
-          deletedRecord
-        };
+        res.locals[LOCAL_AFFECTED_RECORDS] = deletedRecords;
+        res.locals[LOCAL_AFFECTED_ROW_COUNT] = affectedRowCount;
       }
       break;
     case "hard":
@@ -111,7 +112,7 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
           };
         }
 
-        const deletedRecord = await model.findOne({
+        const deletedRecords = await model.findAll({
           where: whereFiltersForHardDelete
         });
 
@@ -119,10 +120,8 @@ const deleteRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
           where: whereFiltersForHardDelete
         });
 
-        res.locals[LOCAL_DELETED] = {
-          affectedRowCount,
-          deletedRecord
-        };
+        res.locals[LOCAL_AFFECTED_RECORDS] = deletedRecords;
+        res.locals[LOCAL_AFFECTED_ROW_COUNT] = affectedRowCount;
       }
       break;
     default:

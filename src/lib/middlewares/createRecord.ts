@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
-import { LOCAL_CREATED } from "../utils/constants";
+import {
+  LOCAL_AFFECTED_RECORDS,
+  LOCAL_AFFECTED_ROW_COUNT
+} from "../utils/constants";
 
 const FUNCTION_NAME = "createRecord()";
 
@@ -35,7 +38,8 @@ const createRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   }
 
   const newRecord = await model.create({ ...req.body, ...valuesFromParams });
-  res.locals[LOCAL_CREATED] = { newRecord };
+  res.locals[LOCAL_AFFECTED_RECORDS] = { newRecord };
+  res.locals[LOCAL_AFFECTED_ROW_COUNT] = 1; // Only one record created at a time
   next();
 };
 

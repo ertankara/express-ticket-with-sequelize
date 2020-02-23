@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
-import { LOCAL_UPDATED } from "../utils/constants";
+import {
+  LOCAL_AFFECTED_RECORDS,
+  LOCAL_AFFECTED_ROW_COUNT
+} from "../utils/constants";
 
 const FUNCTION_NAME = "updateRecord()";
 
@@ -39,7 +42,7 @@ const updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
     reqestParamFilters[passAs || paramName] = paramValue;
   }
 
-  const [, affectedRowCount] = await model.update(req.body, {
+  const [affectedRowCount] = await model.update(req.body, {
     where: { ...whereFiltersForUpdate, ...reqestParamFilters }
   });
 
@@ -51,10 +54,8 @@ const updateRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
     });
   }
 
-  res.locals[LOCAL_UPDATED] = {
-    updatedRecords,
-    affectedRowCount
-  };
+  res.locals[LOCAL_AFFECTED_RECORDS] = updatedRecords;
+  res.locals[LOCAL_AFFECTED_ROW_COUNT] = affectedRowCount;
 
   next();
 };

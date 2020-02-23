@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { Model as TSSequelizeModel } from "sequelize-typescript";
 import { Model as SequelizeModel } from "sequelize";
 import { PaginationParams } from "../utils/types";
-import { LOCAL_PAGINATED, BASE_PAGE_NUMBER } from "../utils/constants";
+import {
+  BASE_PAGE_NUMBER,
+  LOCAL_PAGINATED_RECORDS,
+  LOCAL_RAW_LIST
+} from "../utils/constants";
 
 /**
  *
@@ -65,7 +69,7 @@ const getPaginatedResults = <
       where: { ...where }
     });
 
-    res.locals[LOCAL_PAGINATED] = rawList;
+    res.locals[LOCAL_RAW_LIST] = rawList;
     return next();
   }
 
@@ -79,7 +83,7 @@ const getPaginatedResults = <
     where: { ...where }
   });
 
-  res.locals[LOCAL_PAGINATED] = results;
+  res.locals[LOCAL_PAGINATED_RECORDS] = results;
 
   next();
 };

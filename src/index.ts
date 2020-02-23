@@ -4,10 +4,10 @@ import deleteRecord from "./lib/middlewares/deleteRecord";
 import updateRecord from "./lib/middlewares/updateRecord";
 
 import {
-  LOCAL_CREATED,
-  LOCAL_DELETED,
-  LOCAL_PAGINATED,
-  LOCAL_UPDATED
+  LOCAL_PAGINATED_RECORDS,
+  LOCAL_RAW_LIST,
+  LOCAL_AFFECTED_RECORDS,
+  LOCAL_AFFECTED_ROW_COUNT
 } from "./lib/utils/constants";
 
 export {
@@ -15,8 +15,8 @@ export {
   createRecord,
   deleteRecord,
   updateRecord,
-  LOCAL_CREATED,
-  LOCAL_DELETED,
-  LOCAL_PAGINATED,
-  LOCAL_UPDATED
+  LOCAL_PAGINATED_RECORDS,
+  LOCAL_RAW_LIST,
+  LOCAL_AFFECTED_RECORDS,
+  LOCAL_AFFECTED_ROW_COUNT
 };
