@@ -8,17 +8,6 @@ import {
   LOCAL_RAW_LIST
 } from "../utils/constants";
 
-/**
- *
- * Obtains pagination parameters from `req.query`
- * https://codeforgeek.com/server-side-pagination-using-node-and-mongo/
- * skip = size * (pageNumber - 1)
- * @param model Sequelize model that is passed
- * @param paginationParams If pagination params are different than `page` and `pageSize`
- *                         then keys are needed to be provided so they can be obtained
- *                         from the `req.query`
- * @param filters Filter data with conditions
- */
 const getPaginatedResults = <
   M extends TSSequelizeModel,
   K extends SequelizeModel
@@ -28,14 +17,17 @@ const getPaginatedResults = <
     | ({ new (): K } & typeof SequelizeModel),
   {
     paginationParams = null,
-    where = {}
+    where = {},
+    queryFilters = []
   }: {
     paginationParams?: PaginationParams | null;
     where?: Record<string, any>;
+    queryFilters?: { queryParam: string; expectedToBeEqualTo: any }[];
   } = {}
 ) => async (req: Request, res: Response, next: NextFunction) => {
   let pageNumber;
   let pageSizeNumber;
+  let rest;
 
   // If query params are named to something other than `page` and `pageSize`
   // then use user defined names, else look for to `page` and `pageSize` variables
@@ -45,15 +37,18 @@ const getPaginatedResults = <
     const { pageSizeVariableName, pageNumberVariableName } = paginationParams;
     const {
       [pageSizeVariableName]: presetPageSize,
-      [pageNumberVariableName]: presetPageNumber
+      [pageNumberVariableName]: presetPageNumber,
+      ...all
     } = req.query;
 
     pageNumber = presetPageNumber;
     pageSizeNumber = presetPageSize;
+    rest = all;
   } else {
-    const { pageSize, page } = req.query;
+    const { pageSize, page, ...all } = req.query;
     pageNumber = page;
     pageSizeNumber = pageSize;
+    rest = all;
   }
 
   let [normalizedPage, normalizedPageSize] = [pageNumber, pageSizeNumber]

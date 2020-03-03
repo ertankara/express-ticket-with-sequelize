@@ -13,8 +13,6 @@ Skip writing code for CRUD operations while using `sequelize` or
   property that is passed to the middlewares
 - `req.query` refers to Request objects `query`
   property that is passed to the middlewares
-- `pk` refers to primary keys in databases
-- `fk` refers to foreign keys in the databases
 
 ## Design
 
@@ -26,25 +24,42 @@ e.g
 
 PUT `/api/users/:userId`
 
-if you were to use `updateRecord` for such route to
-handle it. `updateRecord` relies on `:userId` param.
-It can accept the key name but there is no way to
-pass the value for `userId` directly.
+This combination of path and method indicates an update action
+of a user that is identified with value in the `:userId` path
+variable
 
 another example
 
 POST `/api/users`
 
-It's intuitive to assume that this method on this
-route will create a user, `createRecord` would
-rely on `req.body` to create the record.
+The path and method above indicates new creation of user
+it relies on `req.body` to provide user values
 
 Function dependencies for each function are explained
 in detail below
 
 ## `createRecord()`
 
-Creates a record with the passed model in the target table
+Creates a record using the passed model in the target table,
+relies on `req.body` also able to accept parameters from
+the `req.params` by passing and options object with
+`requestParams` property.
+
+```js
+// Fetches `:userId` from path variables and passes to
+// sequelize `create` method as `id`
+// if `passAs` field is not provided then paramName will be passed
+// directly
+createRecord(User, {
+  requestParams: [{ paramName: "userId", passAs: "id" }]
+});
+
+// Fetches /some/path/:userId value
+// Passing it to the User.create({ ...req.body, id: userId })
+```
+
+if no requestParams are provided then this function will only
+rely on the `req.body`
 
 ### Signature
 
@@ -52,18 +67,22 @@ Creates a record with the passed model in the target table
 createRecord = <M extends TSSequelizeModel, K extends SequelizeModel>(
   model:
     | ({ new (): M } & typeof TSSequelizeModel)
-    | ({ new (): K } & typeof SequelizeModel)
+    | ({ new (): K } & typeof SequelizeModel),
+  {
+    requestParams = []
+  }: { requestParams?: { paramName: string; passAs?: string }[] } = {}
 )
 ```
 
 ### Depends On
 
-- `req.body` pass the required fields via body of the
+- `req.body` pass the req.uired fields via body of the
   response
+- `req.params` can be used as well
 
 ### Passes
 
-- `res.locals[LOCAL_CREATED]`
+- `res.locals[LOCAL_AFFECTED_RECORDS]`
   - `newRecord: Record<string, any>;`
 
 ## `getPaginatedResults()`
@@ -81,7 +100,7 @@ getPaginatedResults = <
   model: // Model instance to pass
     | ({ new (): M } & typeof TSSequelizeModel)
     | ({ new (): K } & typeof SequelizeModel),
-  {
+1  {
     // defaults to pageSize & pageNumber
     // custom names can be passed
     // if one of them customized both needs to be provided
